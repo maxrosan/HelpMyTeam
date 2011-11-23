@@ -1,0 +1,43 @@
+Corinthians 	67
+Vasco 	65
+Fluminense 	62
+Internacional 57
+Figueirense 	57
+Flamengo 	57
+SãoPaulo 	56
+Botafogo 	55
+Coritiba 	54
+Santos 	52
+Grêmio 	47
+Palmeiras 46
+Atlético-GO	44
+Atlético-MG 	42
+Bahia 	42
+Cruzeiro 	39
+Ceará	38
+Atlético-PR	38
+América-MG 	34
+Avaí 	30
+
+2
+Palmeiras x SãoPaulo
+Santos x Bahia
+Flamengo x Internacional
+Fluminense x Vasco
+Grêmio x Atlético-GO
+Atlético-MG x Botafogo
+Figueirense x Corinthians
+Coritiba x Avaí
+América-MG x Atlético-PR
+Ceará x Cruzeiro
+
+Corinthians x Palmeiras
+SãoPaulo x Santos
+Internacional x	Grêmio
+Cruzeiro x Atlético-MG
+Atlético-GO x América-MG
+Atlético-PR x Coritiba
+Bahia x Ceará
+Avaí x Figueirense
+Botafogo x Fluminense
+Vasco x Flamengo
