@@ -6,15 +6,30 @@
 #include <string>
 #include <map>
 #include <algorithm>
+#include <gmp.h>
+#include <omp.h>
 
 #define N 20
 
 uint32_t A, B;
 
 uint8_t lib[4], point[N];
-uint64_t count_reb[N], n_poss = 0;
+mpz_t count_reb[N], n_poss;
+omp_lock_t lock_poss;
 
 using namespace std;
+
+void init() {
+	uint8_t i;
+
+	mpz_init(n_poss);
+
+	for (i = 0; i < N; i++) {
+		mpz_init(count_reb[i]);
+	}
+
+	omp_init_lock(&lock_poss);
+}
 
 void min_arr(uint8_t points[N], uint8_t arr[10], uint8_t n) {
 	uint8_t k, l, l_min;
@@ -37,55 +52,85 @@ void min_arr(uint8_t points[N], uint8_t arr[10], uint8_t n) {
 	}
 }
 
-void calc_lim(uint8_t points[N], uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim) {
+void calc_lim(uint8_t points[N], uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, bool thread_div);
+
+inline static void loop(int i, int x, int y, uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, uint8_t modpoints[N], uint8_t points[N]) {
+	for (y = 0; y < (1 << lim); y++) {
+
+		if (x & y) continue;
+
+		memcpy(modpoints, points, N);
+
+		for (i = 0; i < (N>>1); i++) {
+
+			if(matches[rod][i][0] == 0 && matches[rod][i][1] == 0) continue;
+
+			A = x & (1 << i);
+			B = y & (1 << i);
+
+			//printf("%d x %d => %d%d\n", matches[rod][i][0], matches[rod][i][1], !!A, !!B);
+
+			if (!A && !B) {
+				modpoints[matches[rod][i][0]] += 1;
+				modpoints[matches[rod][i][1]] += 1;
+			} else if (A) {
+				modpoints[matches[rod][i][0]] += 3;
+			} else {
+				modpoints[matches[rod][i][1]] += 3;
+			}
+		}
+
+		calc_lim(modpoints, matches, Nrods, rod+1, lim, false);
+	}
+
+}
+
+void calc_lim(uint8_t points[N], uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, bool thread_div) {
 	uint8_t modpoints[N];
 	uint32_t x, y, i;
 
 	if (rod >= Nrods) {
+
+		omp_set_lock(&lock_poss);
 		min_arr(points, lib, 4);
 
-		count_reb[lib[0]]++;
+		for (i = 0; i < 4; i++) {
+			mpz_add_ui(count_reb[lib[i]], count_reb[lib[i]], 1);
+		}
+
+		mpz_add_ui(n_poss, n_poss, 1);
+		omp_unset_lock(&lock_poss);
+
+		/*count_reb[lib[0]]++;
 		count_reb[lib[1]]++;
 		count_reb[lib[2]]++;
 		count_reb[lib[3]]++;
 
-		n_poss++;
+		n_poss++;*/
 
 		return;
 	}
 
-	for (x = 0; x < (1 << lim); x++) {
-		for (y = 0; y < (1 << lim); y++) {
-
-			if (x & y) continue;
-
-			memcpy(modpoints, points, N);
-
-			for (i = 0; i < (N>>1); i++) {
-
-				if(matches[rod][i][0] == 0 && matches[rod][i][1] == 0) continue;
-
-				A = x & (1 << i);
-				B = y & (1 << i);
-
-				//printf("%d x %d => %d%d\n", matches[rod][i][0], matches[rod][i][1], !!A, !!B);
-
-				if (!A && !B) {
-					modpoints[matches[rod][i][0]] += 1;
-					modpoints[matches[rod][i][1]] += 1;
-				} else if (A) {
-					modpoints[matches[rod][i][0]] += 3;
-				} else {
-					modpoints[matches[rod][i][1]] += 3;
-				}
-			}
-
-			calc_lim(modpoints, matches, Nrods, rod+1, lim);
+	if (thread_div) {
+		#pragma omp parallel for private(x,y,i,modpoints) num_threads(NTHREADS)
+		for (x = 0; x < (1 << lim); x++) {
+			loop(i, x, y, matches, Nrods, rod, lim, modpoints, points);
 		}
+
+	} else {
+		for (x = 0; x < (1 << lim); x++)
+			loop(i, x, y, matches, Nrods, rod, lim, modpoints, points);
 	}
 }
 
 uint8_t match[N*N*2][N>>1][2];
+int sort_team[N];
+
+static int compare(const void *a, const void *b) {
+	int aI = *((int*) a);
+	int bI = *((int*) b);
+	return mpz_cmp(count_reb[aI], count_reb[bI]);
+}
 
 int main() {
 
@@ -97,7 +142,8 @@ int main() {
 	uint32_t x;
 	uint32_t i;
 
-	bzero(count_reb, N);
+	init();
+	//bzero(count_reb, N);
 
 	printf("Times: \n");
 
@@ -135,15 +181,32 @@ int main() {
 		printf("####\n");
 	}
 
-	n_poss = 1;
+	//n_poss = 1;
+	mpz_set_ui(n_poss, 1);
 
-	calc_lim(point, match, rods, 0, lim);
+	calc_lim(point, match, rods, 0, lim, true);
 
 	printf("\n\n Time | Reb. \n");
-	printf("NP = %lu\n", n_poss);
+	
+	printf("NP = ");
+	mpz_out_str(stdout, 10, n_poss);
+	printf("\n");
 
-	for (i = 0; i <= lim; i++) {
-		printf("%s %.2lf\n", names[N-i-1].c_str(), 100.*((double) count_reb[i])/((double) n_poss));
+	for (i = 0; i < N; i++) {
+		sort_team[i] = i;
+	}
+
+	qsort(sort_team, N, sizeof(int), compare);
+
+	for (i = 0; i < N; i++) {
+		int J = sort_team[i];
+		mpz_mul_ui(count_reb[J], count_reb[J], 100);
+		mpz_cdiv_q(count_reb[J], count_reb[J], n_poss);
+
+		printf("%s ", names[N-J-1].c_str());
+		mpz_out_str(stdout, 10, count_reb[J]);
+		printf("% \n");
+		//printf("%s %.2lf\n", names[N-i-1].c_str(), 100.*((double) count_reb[i])/((double) n_poss));
 	}
 
 }
