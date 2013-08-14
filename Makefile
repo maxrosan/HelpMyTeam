@@ -1,6 +1,6 @@
 
-NTHREADS = 4
-FLAGS = -DNTHREADS=4 -ggdb -fopenmp -O2
+NTHREADS = 3
+FLAGS = -DNTHREADS=$(NTHREADS) -ggdb -fopenmp -O3
 
 all: demoted
 

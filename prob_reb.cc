@@ -8,16 +8,20 @@
 #include <algorithm>
 #include <gmp.h>
 #include <omp.h>
+#include <assert.h>
+
+using namespace std;
 
 #define N 20
 
 uint32_t A, B;
 
-uint8_t lib[4], point[N];
+uint8_t lib[N], point[N];
 mpz_t count_reb[N], n_poss;
 omp_lock_t lock_poss;
+string names[N];
 
-using namespace std;
+void calc_lim(uint8_t points[N], uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, bool thread_div);
 
 void init() {
 	uint8_t i;
@@ -31,32 +35,48 @@ void init() {
 	omp_init_lock(&lock_poss);
 }
 
-void min_arr(uint8_t points[N], uint8_t arr[10], uint8_t n) {
+void min_arr(uint8_t points[N], uint8_t arr[N]) {
 	uint8_t k, l, l_min;
+	uint32_t num_used = 0;
+
 	arr[0] = l_min = 0;
+	
+	assert(N < 32);
+
 	for (k = 1; k < N; k++) {
-		if (points[k] < points[arr[0]]) arr[0] = k;
-		if (points[k] > points[l_min]) l_min = k;
+		if (points[k] <= points[arr[0]]) arr[0] = k;
+		if (points[k] >= points[l_min]) l_min = k;
 	}
 
-	if (n == 1)
-		return;
+	num_used |= (1 << arr[0]);
 
-	for (k = 1; k < n; k++) {
+	for (k = 1; k < N; k++) {
+
 		arr[k] = l_min;
+
 		for (l = 0; l < N; l++) {
-			if (points[l] < points[arr[k]] && points[l] > points[arr[k-1]] && l != arr[k-1]) {
+			if (points[l] <= points[arr[k]] && !( (1 << l) & num_used )) {
 				arr[k] = l;
 			}
 		}
+
+		num_used |= (1 << arr[k]);
 	}
 }
 
-void calc_lim(uint8_t points[N], uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, bool thread_div);
+inline static void loop(int i, int x, uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, uint8_t modpoints[N], uint8_t points[N]) {
 
-inline static void loop(int i, int x, int y, uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, uint8_t modpoints[N], uint8_t points[N]) {
+	uint16_t y;
+
 	for (y = 0; y < (1 << lim); y++) {
 
+		/*
+		 A | B | Result
+		 0 | 0 |  draw
+		 0 | 1 | B wins
+		 1 | 0 | A wins
+		 1 | 1 | not valid result
+		*/
 		if (x & y) continue;
 
 		memcpy(modpoints, points, N);
@@ -67,8 +87,6 @@ inline static void loop(int i, int x, int y, uint8_t matches[][N>>1][2], uint8_t
 
 			A = x & (1 << i);
 			B = y & (1 << i);
-
-			//printf("%d x %d => %d%d\n", matches[rod][i][0], matches[rod][i][1], !!A, !!B);
 
 			if (!A && !B) {
 				modpoints[matches[rod][i][0]] += 1;
@@ -87,39 +105,37 @@ inline static void loop(int i, int x, int y, uint8_t matches[][N>>1][2], uint8_t
 
 void calc_lim(uint8_t points[N], uint8_t matches[][N>>1][2], uint8_t Nrods, uint8_t rod, uint8_t lim, bool thread_div) {
 	uint8_t modpoints[N];
-	uint32_t x, y, i;
+	uint32_t x, i;
 
 	if (rod >= Nrods) {
 
 		omp_set_lock(&lock_poss);
-		min_arr(points, lib, 4);
+		min_arr(points, lib);
 
 		for (i = 0; i < 4; i++) {
+			mpz_add_ui(count_reb[lib[i]], count_reb[lib[i]], 1);
+		}
+
+		for (i = 4; (i < N) && (points[lib[i]] == points[lib[3]]); i++) {
 			mpz_add_ui(count_reb[lib[i]], count_reb[lib[i]], 1);
 		}
 
 		mpz_add_ui(n_poss, n_poss, 1);
 		omp_unset_lock(&lock_poss);
 
-		/*count_reb[lib[0]]++;
-		count_reb[lib[1]]++;
-		count_reb[lib[2]]++;
-		count_reb[lib[3]]++;
+	} else {
 
-		n_poss++;*/
+		if (thread_div) {
+			#pragma omp parallel for private(x,i,modpoints) num_threads(NTHREADS)
+			for (x = 0; x < (1 << lim); x++) {
+				loop(i, x, matches, Nrods, rod, lim, modpoints, points);
+			}
 
-		return;
-	}
-
-	if (thread_div) {
-		#pragma omp parallel for private(x,y,i,modpoints) num_threads(NTHREADS)
-		for (x = 0; x < (1 << lim); x++) {
-			loop(i, x, y, matches, Nrods, rod, lim, modpoints, points);
+		} else {
+			for (x = 0; x < (1 << lim); x++)
+				loop(i, x, matches, Nrods, rod, lim, modpoints, points);
 		}
 
-	} else {
-		for (x = 0; x < (1 << lim); x++)
-			loop(i, x, y, matches, Nrods, rod, lim, modpoints, points);
 	}
 }
 
@@ -137,7 +153,6 @@ int main() {
 	uint8_t rods;
 	char name[100], name1[100], vs;
 	map<string, uint8_t> teams;
-	string names[N];
 	uint8_t lim = 3;
 	uint32_t x;
 	uint32_t i;
@@ -160,6 +175,7 @@ int main() {
 
 	reverse(point, point+N);
 
+	// It avoids unnecessary calculation. 
 	for (i = 4; i < N; i++) {
 		if ((point[3] + rods*3) >= point[i]) {
 			lim = i;
