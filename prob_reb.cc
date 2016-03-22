@@ -202,7 +202,7 @@ int main() {
 
 	calc_lim(point, match, rods, 0, lim, true);
 
-	printf("\n\n Time | Reb. \n");
+	printf("\n\n Team | Chance of being relegated \n");
 	
 	printf("NP = ");
 	mpz_out_str(stdout, 10, n_poss);

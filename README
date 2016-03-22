@@ -1,0 +1,105 @@
+
+This program calculates the chance of each team finishing in the relegation zone.
+The method utilized to calculate the chances is brute force with few optimizations.
+
+The expected input is a file containing partil results of the championship so far and the list of the forthcoming matches. For example, the following example is in the expected format for the program: 
+
+Corinthians 	67
+Vasco 	65
+Fluminense 	62
+Internacional 57
+Figueirense 	57
+Flamengo 	57
+SãoPaulo 	56
+Botafogo 	55
+Coritiba 	54
+Santos 	52
+Grêmio 	47
+Palmeiras 46
+Atlético-GO	44
+Atlético-MG 	42
+Bahia 	42
+Cruzeiro 	39
+Ceará	38
+Atlético-PR	38
+América-MG 	34
+Avaí 	30
+
+2
+Palmeiras x SãoPaulo
+Santos x Bahia
+Flamengo x Internacional
+Fluminense x Vasco
+Grêmio x Atlético-GO
+Atlético-MG x Botafogo
+Figueirense x Corinthians
+Coritiba x Avaí
+América-MG x Atlético-PR
+Ceará x Cruzeiro
+
+Corinthians x Palmeiras
+SãoPaulo x Santos
+Internacional x	Grêmio
+Cruzeiro x Atlético-MG
+Atlético-GO x América-MG
+Atlético-PR x Coritiba
+Bahia x Ceará
+Avaí x Figueirense
+Botafogo x Fluminense
+Vasco x Flamengo
+
+
+The first part of the input contains basically the current table of championship, containing the name and the points of each team. In the first part each line must have the name of team (without spaces in case of compound names, like São Paulo or New Castle should be turned into SãoPaulo and NewCastle, respectively) and the number of points. The example above came from a Brazilian Championship that took place some years ago. 
+
+The second part contains information about the forthcoming games. First, it is necessary to inform how many rounds are going to take place until the end of the championship, like the example above, which inform there are still two rounds to take place. After that, the remaining matches must be informed and grouped by rounds. Regarding the line informing a match, the names of the teams must be separed by x and, in case of compound names again, the space must be removed.
+
+For the example above, the following output is expected:
+
+Team | Chance of being relegated 
+NP = 4782970
+Atlético-GO 0% 
+Palmeiras 0% 
+Grêmio 0% 
+Santos 0% 
+Coritiba 0% 
+Botafogo 0% 
+SãoPaulo 0% 
+Flamengo 0% 
+Figueirense 0% 
+Internacional 0% 
+Fluminense 0% 
+Vasco 0% 
+Corinthians 0% 
+Bahia 4% 
+Atlético-MG 4% 
+Cruzeiro 57% 
+Ceará 75% 
+Atlético-PR 86% 
+Avaí 100% 
+América-MG 100%
+
+It means that América-MG and Avaí are already relegated to Second Division and the teams ranging from Atlético-MG to Bahia are fighting to escape from relegation zone, considering four teams are relegated in the Brazilian championship.
+
+NP variable informs the number of possibilities calculated to get the result given.
+
+------------------
+
+OpenMP is a dependency, it was utilized to parellelize some calculations.
+
+------------------
+
+How to compile it:
+
+Just execute the following command: make
+
+So a binary named calculate_chance will be generated.
+
+-----------------
+
+How to execute it:
+
+./calculate_chance < in.txt
+
+Where in.txt is the input file with the championship table and the forthcoming matches.
+
+---------------

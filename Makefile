@@ -2,9 +2,9 @@
 NTHREADS = 3
 FLAGS = -DNTHREADS=$(NTHREADS) -ggdb -fopenmp -O3
 
-all: demoted
+all: calculate_chance
 
-demoted: prob_reb.o
+calculate_chance: prob_reb.o
 	g++ $? $(FLAGS) -lgmp -lgmpxx -lgomp -o $@
 
 %.o: %.cc
