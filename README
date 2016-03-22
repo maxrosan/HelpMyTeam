@@ -1,5 +1,5 @@
 
-This program calculates the chance of each team finishing in the relegation zone.
+Given an all-play-all championship with 20 teams and a 4-team relegation zone, this program calculates the chance of each team finishing in the relegation zone.
 The method utilized to calculate the chances is brute force with few optimizations.
 
 The expected input is a file containing partil results of the championship so far and the list of the forthcoming matches. For example, the following example is in the expected format for the program: 
@@ -78,7 +78,7 @@ Atlético-PR 86%
 Avaí 100% 
 América-MG 100%
 
-It means that América-MG and Avaí are already relegated to Second Division and the teams ranging from Atlético-MG to Bahia are fighting to escape from relegation zone, considering four teams are relegated in the Brazilian championship.
+It means that América-MG and Avaí are already relegated to Second Division and the teams ranging from Atlético-MG to Bahia are fighting to escape from relegation zone, considering four teams are relegated in the Brazilian championship. The remaining teams have no chance of being relegated.
 
 NP variable informs the number of possibilities calculated to get the result given.
 
@@ -103,3 +103,5 @@ How to execute it:
 Where in.txt is the input file with the championship table and the forthcoming matches.
 
 ---------------
+
+Unfortunately, the number of teams participating in the championship is hardcoded and must be altered provided the championship has a different number of teams or a relation zone with a different size.
