@@ -1,0 +1,16 @@
+10	
+1	 Uruguay	6	4	1	1	12	4	+8	13		x	MD11	MD15	3x0	3x0	MD13	MD8	1x0	MD18	MD9
+2	 Ecuador	6	4	1	1	12	7	+5	13		2x1	x	MD18	MD9	MD14	MD7	2x2	MD16	2x0	MD12
+3	 Argentina	6	3	2	1	6	4	+2	11		MD7	0x2	x	MD13	MD12	1x1	MD10	MD17	2x0	MD16
+4	 Chile		6	3	1	2	12	10	+2	10		MD12	MD17	1x2	x	1x1	2x0	MD15	MD10	MD8	MD14
+5	 Colombia	6	3	1	2	9	8	+1	10		MD10	3x1	0x1	MD11	x	MD16	MD17	2x0	MD13	MD7
+6	 Brazil		6	2	3	1	11	8	+3	9		2x2	MD15	MD11	MD18	MD8	x	MD14	3x0	MD9	3x1
+7	 Paraguay	6	2	3	1	7	6	+1	9		MD16	MD13	0x0	MD7	MD9	2x2	x	MD11	2x1	MD18
+8	 Peru		6	1	1	4	6	12	-6	4		MD14	MD8	MD9	3x4	MD18	MD12	1x0	x	MD15	2x2
+9	 Bolivia	6	1	0	5	7	13	-6	3		0x2	MD10	MD14	MD16	2x3	MD17	MD12	MD7	x	4x2
+10	 Venezuela	6	0	1	5	7	17	-10	1		MD17	1x3	MD8	1x4	MD15	MD10	0x1	MD13	MD11	x
+4
+Ecuador v Brazil
+Bolivia v Peru
+Argentina v Uruguay
+Colombia v Venezuela
