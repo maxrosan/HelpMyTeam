@@ -103,27 +103,27 @@ void calculateMeans() {
 
 	meanGoalsForHomeTotal = std::accumulate(goalsForHome.begin(), goalsForHome.end(), 0.0, [](double acc, int result) {
 			return (acc + result);
-	}) / (numberOfMatches * numberOfTeams);
+	}) / (numberOfMatches * numberOfTeams / 2);
 
 	meanGoalsAgainstHomeTotal = std::accumulate(goalsAgainstHome.begin(), goalsAgainstHome.end(), 0.0, [](double acc, int result) {
 			return (acc + result);
-	}) / (numberOfTeams * numberOfTeams);
+	}) / (numberOfTeams * numberOfTeams / 2);
 
 	meanGoalsForAwayTotal = std::accumulate(goalsForAway.begin(), goalsForAway.end(), 0.0, [](double acc, int result) {
 			return (acc + result);
-	}) / (numberOfTeams * numberOfTeams);
+	}) / (numberOfTeams * numberOfTeams / 2);
 
 	meanGoalsAgainstAwayTotal = std::accumulate(goalsAgainstAway.begin(), goalsAgainstAway.end(), 0.0, [](double acc, int result) {
 			return (acc + result);
-	}) / (numberOfTeams * numberOfTeams);
+	}) / (numberOfTeams * numberOfTeams / 2);
 
 	//std::cout << meanGoalsForHomeTotal << " " << meanGoalsAgainstHomeTotal << " " << meanGoalsForAwayTotal << " " << meanGoalsAgainstAwayTotal << std::endl;
 
 	for (i = 0; i < numberOfTeams; i++) {
-		meanGoalsForHome.push_back(((double) goalsForHome[i]) / numberOfMatches);
-		meanGoalsAgainstHome.push_back(((double) goalsAgainstHome[i]) / numberOfMatches);
-		meanGoalsForAway.push_back(((double) goalsForAway[i]) / numberOfMatches);
-		meanGoalsAgainstAway.push_back(((double) goalsAgainstAway[i]) / numberOfMatches);
+		meanGoalsForHome.push_back(((double) goalsForHome[i]) / ( numberOfMatches / 2 ));
+		meanGoalsAgainstHome.push_back(((double) goalsAgainstHome[i]) /  ( numberOfMatches / 2));
+		meanGoalsForAway.push_back(((double) goalsForAway[i]) / ( numberOfMatches / 2 ));
+		meanGoalsAgainstAway.push_back(((double) goalsAgainstAway[i]) / (numberOfMatches / 2));
 	}
 
 }
