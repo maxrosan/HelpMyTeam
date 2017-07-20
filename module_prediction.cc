@@ -68,8 +68,6 @@ void calculateExpectedResult(int teamA, int teamB, int& resultA, int& resultB, d
 	for (i = 0; i < 10; i++) {
 		for (j = 0; j < 10; j++) {
 
-			if (i == 0 && j == 0) continue;
-
 			possibleResults[i][j] = poisson(homeExp, i) * poisson(awayExp, j) * 100.;
 
 			//std::cout << possibleResults[i][j] << " (" <<  possibleResults[iMax][jMax] << " )";
